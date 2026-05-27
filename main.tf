@@ -13,21 +13,31 @@ provider "azurerm" {
 }
 
 locals {
+  dc1_post_setup_b64 = base64encode(templatefile("${path.module}/scripts/post-setup.ps1", {
+    domain_name    = "firstad.local"
+    admin_username = var.admin_username
+  }))
   dc1_encoded = textencodebase64(
     templatefile("${path.module}/scripts/dc-setup.ps1", {
       domain_name    = "firstad.local"
       netbios_name   = "FIRSTAD"
       admin_password = var.admin_password
       admin_username = var.admin_username
+      post_setup_b64 = local.dc1_post_setup_b64
     }),
     "UTF-16LE"
   )
+  dc2_post_setup_b64 = base64encode(templatefile("${path.module}/scripts/post-setup.ps1", {
+    domain_name    = "secondad.local"
+    admin_username = var.admin_username
+  }))
   dc2_encoded = textencodebase64(
     templatefile("${path.module}/scripts/dc-setup.ps1", {
       domain_name    = "secondad.local"
       netbios_name   = "SECONDAD"
       admin_password = var.admin_password
       admin_username = var.admin_username
+      post_setup_b64 = local.dc2_post_setup_b64
     }),
     "UTF-16LE"
   )
