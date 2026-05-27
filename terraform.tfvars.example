@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars and fill in your subscription ID.
+# terraform.tfvars is gitignored — never committed.
+
+subscription_id = "your-azure-subscription-id"
