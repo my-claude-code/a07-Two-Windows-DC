@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
-    time = {
-      source  = "hashicorp/time"
-      version = "~> 0.9"
-    }
   }
 }
 
@@ -44,22 +40,11 @@ resource "azurerm_resource_group" "dc1" {
   location = "Canada East"
 }
 
-resource "time_sleep" "dc1_rg_ready" {
-  create_duration = "30s"
-  depends_on      = [azurerm_resource_group.dc1]
-}
-
 resource "azurerm_virtual_network" "dc1" {
   name                = "vnet-dc1"
   location            = azurerm_resource_group.dc1.location
   resource_group_name = azurerm_resource_group.dc1.name
   address_space       = ["10.0.0.0/16"]
-  depends_on          = [time_sleep.dc1_rg_ready]
-}
-
-resource "time_sleep" "dc1_vnet_ready" {
-  create_duration = "30s"
-  depends_on      = [azurerm_virtual_network.dc1]
 }
 
 resource "azurerm_subnet" "dc1" {
@@ -67,14 +52,12 @@ resource "azurerm_subnet" "dc1" {
   resource_group_name  = azurerm_resource_group.dc1.name
   virtual_network_name = azurerm_virtual_network.dc1.name
   address_prefixes     = ["10.0.1.0/24"]
-  depends_on           = [time_sleep.dc1_vnet_ready]
 }
 
 resource "azurerm_network_security_group" "dc1" {
   name                = "nsg-dc1"
   location            = azurerm_resource_group.dc1.location
   resource_group_name = azurerm_resource_group.dc1.name
-  depends_on          = [time_sleep.dc1_rg_ready]
 
   security_rule {
     name                       = "allow-all-inbound"
@@ -100,7 +83,6 @@ resource "azurerm_public_ip" "dc1" {
   resource_group_name = azurerm_resource_group.dc1.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  depends_on          = [time_sleep.dc1_rg_ready]
 }
 
 resource "azurerm_network_interface" "dc1" {
@@ -162,22 +144,11 @@ resource "azurerm_resource_group" "dc2" {
   location = "West US 2"
 }
 
-resource "time_sleep" "dc2_rg_ready" {
-  create_duration = "30s"
-  depends_on      = [azurerm_resource_group.dc2]
-}
-
 resource "azurerm_virtual_network" "dc2" {
   name                = "vnet-dc2"
   location            = azurerm_resource_group.dc2.location
   resource_group_name = azurerm_resource_group.dc2.name
   address_space       = ["10.1.0.0/16"]
-  depends_on          = [time_sleep.dc2_rg_ready]
-}
-
-resource "time_sleep" "dc2_vnet_ready" {
-  create_duration = "30s"
-  depends_on      = [azurerm_virtual_network.dc2]
 }
 
 resource "azurerm_subnet" "dc2" {
@@ -185,14 +156,12 @@ resource "azurerm_subnet" "dc2" {
   resource_group_name  = azurerm_resource_group.dc2.name
   virtual_network_name = azurerm_virtual_network.dc2.name
   address_prefixes     = ["10.1.1.0/24"]
-  depends_on           = [time_sleep.dc2_vnet_ready]
 }
 
 resource "azurerm_network_security_group" "dc2" {
   name                = "nsg-dc2"
   location            = azurerm_resource_group.dc2.location
   resource_group_name = azurerm_resource_group.dc2.name
-  depends_on          = [time_sleep.dc2_rg_ready]
 
   security_rule {
     name                       = "allow-all-inbound"
@@ -218,7 +187,6 @@ resource "azurerm_public_ip" "dc2" {
   resource_group_name = azurerm_resource_group.dc2.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  depends_on          = [time_sleep.dc2_rg_ready]
 }
 
 resource "azurerm_network_interface" "dc2" {
